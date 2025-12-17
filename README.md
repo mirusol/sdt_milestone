@@ -2,7 +2,9 @@
 
 A Netflix-like video streaming platform demonstrating microservices architecture and design patterns.
 
-**Team:** Bilciurescu Elena-Alina, Solomon Miruna-Maria, Toma Daria-Maria  
+**Team:** Bilciurescu Elena-Alina, 
+Solomon Miruna Maria,
+Toma Daria-Maria  
 **Group:** 1241EA CTI-E  
 **Course:** Software Design Techniques  
 **Target Grade:** 10/10
