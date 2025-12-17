@@ -1,0 +1,508 @@
+{
+	"info": {
+		"name": "StreamFlix - Message Queue Test Collection",
+		"description": "Complete test sequence for Message Queue (RabbitMQ) integration. Tests Video Service → RabbitMQ → Recommendation Service flow.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01 Setup - Create Users",
+			"item": [
+				{
+					"name": "1. Create User 1 (test_user)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('userId1', jsonData.id);",
+									"        console.log('Saved userId1:', jsonData.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"test_user\",\n  \"email\": \"test@streamflix.com\",\n  \"password\": \"Test123!\",\n  \"tier\": \"PREMIUM\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "users", "register"]
+						}
+					}
+				},
+				{
+					"name": "2. Create User 2 (demo_user)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('userId2', jsonData.id);",
+									"        console.log('Saved userId2:', jsonData.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"demo_user\",\n  \"email\": \"demo@streamflix.com\",\n  \"password\": \"Demo123!\",\n  \"tier\": \"STANDARD\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/users/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "users", "register"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "02 Setup - Create Content",
+			"item": [
+				{
+					"name": "3. Create Movie 1 (Inception)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('contentId1', jsonData.id);",
+									"        console.log('Saved contentId1:', jsonData.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MOVIE\",\n  \"title\": \"Inception\",\n  \"description\": \"A mind-bending thriller about dreams within dreams\",\n  \"genre\": \"Sci-Fi\",\n  \"releaseYear\": 2010,\n  \"duration\": 148,\n  \"director\": \"Christopher Nolan\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/content",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "content"]
+						}
+					}
+				},
+				{
+					"name": "4. Create Movie 2 (The Matrix)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('contentId2', jsonData.id);",
+									"        console.log('Saved contentId2:', jsonData.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"MOVIE\",\n  \"title\": \"The Matrix\",\n  \"description\": \"A computer hacker learns about the true nature of reality\",\n  \"genre\": \"Sci-Fi\",\n  \"releaseYear\": 1999,\n  \"duration\": 136,\n  \"director\": \"The Wachowskis\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/content",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "content"]
+						}
+					}
+				},
+				{
+					"name": "5. Create TV Series (Breaking Bad)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.collectionVariables.set('contentId3', jsonData.id);",
+									"        console.log('Saved contentId3:', jsonData.id);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"TV_SERIES\",\n  \"title\": \"Breaking Bad\",\n  \"description\": \"A high school chemistry teacher turned methamphetamine manufacturer\",\n  \"genre\": \"Drama\",\n  \"releaseYear\": 2008,\n  \"seasons\": 5,\n  \"episodesPerSeason\": 16\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/content",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "content"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "03 Message Queue Tests - Watch Events",
+			"item": [
+				{
+					"name": "6. Record Watch Event 1 (Triggers RabbitMQ)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId1}},\n  \"contentId\": {{contentId1}},\n  \"progress\": 3600,\n  \"completed\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/videos/watch",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "watch"]
+						},
+						"description": "This request triggers a message to be published to RabbitMQ queue. Check RabbitMQ UI at http://localhost:15672 to see the message."
+					}
+				},
+				{
+					"name": "7. Record Watch Event 2 (Triggers RabbitMQ)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId1}},\n  \"contentId\": {{contentId2}},\n  \"progress\": 7200,\n  \"completed\": true\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/videos/watch",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "watch"]
+						}
+					}
+				},
+				{
+					"name": "8. Record Watch Event 3 (Different User)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId2}},\n  \"contentId\": {{contentId1}},\n  \"progress\": 1800,\n  \"completed\": false\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/videos/watch",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "watch"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "04 Message Queue Tests - Ratings",
+			"item": [
+				{
+					"name": "9. Rate Content 1 (Triggers RabbitMQ)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId1}},\n  \"contentId\": {{contentId1}},\n  \"score\": 5.0\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/videos/rate",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "rate"]
+						},
+						"description": "This rating triggers a message to RabbitMQ. The Recommendation Service will update user preferences with the rating."
+					}
+				},
+				{
+					"name": "10. Rate Content 2 (Triggers RabbitMQ)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId1}},\n  \"contentId\": {{contentId2}},\n  \"score\": 4.5\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/videos/rate",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "rate"]
+						}
+					}
+				},
+				{
+					"name": "11. Rate Content 3 (Different Rating)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": {{userId1}},\n  \"contentId\": {{contentId3}},\n  \"score\": 4.0\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/videos/rate",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "rate"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "05 Verify Message Queue Results",
+			"item": [
+				{
+					"name": "12. Get User Preferences (Verify RabbitMQ Updated)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/recommendations/preferences/{{userId1}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "recommendations", "preferences", "{{userId1}}"]
+						},
+						"description": "This should show updated preferences from RabbitMQ messages. Check watchCount, averageRating, and preferredGenres."
+					}
+				},
+				{
+					"name": "13. Get Watch History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/videos/watch/user/{{userId1}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "watch", "user", "{{userId1}}"]
+						}
+					}
+				},
+				{
+					"name": "14. Get User Ratings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/videos/rate/user/{{userId1}}",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "rate", "user", "{{userId1}}"]
+						}
+					}
+				},
+				{
+					"name": "15. Get Recommendations (Uses Updated Preferences)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/recommendations/{{userId1}}?limit=5",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "recommendations", "{{userId1}}"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								}
+							]
+						},
+						"description": "Recommendations should be based on preferences updated via RabbitMQ messages."
+					}
+				}
+			]
+		},
+		{
+			"name": "06 Health Checks",
+			"item": [
+				{
+					"name": "16. Gateway Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/health",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["actuator", "health"]
+						}
+					}
+				},
+				{
+					"name": "17. Video Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/videos/health",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "videos", "health"]
+						}
+					}
+				},
+				{
+					"name": "18. Recommendation Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/recommendations/health",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "recommendations", "health"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "userId1",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "userId2",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"key": "contentId1",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "contentId2",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"key": "contentId3",
+			"value": "3",
+			"type": "string"
+		}
+	]
+}
+
