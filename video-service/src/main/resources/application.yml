@@ -24,7 +24,7 @@ spring:
     serialization:
       write-dates-as-timestamps: false
     time-zone: UTC
-  
+
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}
     port: ${SPRING_RABBITMQ_PORT:5672}

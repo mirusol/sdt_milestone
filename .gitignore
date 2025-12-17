@@ -34,3 +34,10 @@ hs_err_pid*
 .env
 bin/
 out/
+
+# Images (except diagrams in docs)
+*.jpg
+*.jpeg
+IMG-*.jpg
+IMG-*.jpeg
+!docs/diagrams/*.png
