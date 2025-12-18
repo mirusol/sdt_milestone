@@ -1,32 +1,20 @@
-# StreamFlix - Microservices Video Streaming Platform
+# MILESTONE 5- StreamFlix - Microservices Video Streaming Platform
 
-A Netflix-like video streaming platform demonstrating microservices architecture and design patterns.
+A Netflix-like video streaming platform demonstrating microservices architecture, design patterns, **message queue integration**, and a **CI/CD pipeline**
 
 **Team:** Bilciurescu Elena-Alina, 
-Solomon Miruna Maria,
+Solomon Miruna-Maria,
 Toma Daria-Maria  
 **Group:** 1241EA CTI-E  
 **Course:** Software Design Techniques  
-**Target Grade:** 10/10
-
----
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Architecture](#architecture)
-- [Design Patterns](#design-patterns)
-- [Getting Started](#getting-started)
-- [API Documentation](#api-documentation)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Team](#team)
-
----
 
 ## Project Overview
 
 StreamFlix is a proof-of-concept microservices application that demonstrates four non-trivial design patterns (Factory Method, Strategy, Observer, Singleton) integrated into a video streaming platform architecture.
+
+This **Milestone 5** extends the previous milestones by:
+- Integrating **RabbitMQ** as a message queue for **asynchronous communication** between services.
+- Adding a **GitHub Actions CI/CD pipeline** that automatically **builds, tests, and deploys** the microservices into a local Docker environment.
 
 ### Core Features
 
@@ -635,9 +623,9 @@ curl http://localhost:8080/api/recommendations/preferences/1
 4. View logs for each job
 
 **Pipeline Status:**
-- ✅ Green checkmark = Success
-- ❌ Red X = Failure
-- 🟡 Yellow circle = In progress
+- Green checkmark = Success
+- Red X = Failure
+- Yellow circle = In progress
 
 ### Local Testing
 
@@ -716,174 +704,203 @@ curl http://localhost:8080/actuator/health
 
 ## Project Structure
 
-```
+```text
 streamflix/
-├── api-gateway/                 # Spring Cloud Gateway (Port 8080)
-│   ├── src/main/
-│   │   ├── java/                # Gateway configuration
-│   │   └── resources/
-│   │       ├── application.yml  # Routes configuration
-│   │       └── static/ui/       # Web UI files
+├── api-gateway/                         
+│   ├── src/main/java/com/example/apigateway/
+│   │   ├── ApiGatewayApplication.java    
+│   │   ├── config/                       
+│   │   │   └── GatewayConfig.java
+│   │   ├── controller/                   
+│   │   │   ├── FallbackController.java
+│   │   │   └── HealthController.java
+│   │   └── filter/                       
+│   │       └── RequestLoggingFilter.java
+│   ├── src/main/resources/
+│   │   ├── application.yml               
+│   │   └── static/ui/                   
+│   │       ├── app.js
+│   │       ├── index.html
+│   │       └── styles.css
 │   ├── Dockerfile
 │   └── pom.xml
 │
-├── user-service/                # Singleton Pattern (Port 8081)
-│   ├── src/main/java/
+├── user-service/                         
+│   ├── src/main/java/com/example/userservice/
+│   │   ├── UserServiceApplication.java   
 │   │   ├── config/
-│   │   │   └── ConfigurationManager.java  # Singleton
-│   │   ├── controller/          # REST endpoints
-│   │   ├── service/             # Business logic
-│   │   ├── repository/          # Data access
-│   │   ├── model/               # User entity
-│   │   └── dto/                 # Data transfer objects
-│   ├── Dockerfile
-│   └── pom.xml
-│
-├── content-service/             # Factory Pattern (Port 8082)
-│   ├── src/main/java/
-│   │   ├── factory/
-│   │   │   ├── ContentFactory.java      # Factory interface
-│   │   │   ├── MovieFactory.java        # Movie creator
-│   │   │   └── TVSeriesFactory.java     # TV Series creator
+│   │   │   ├── ConfigurationManager.java 
+│   │   │   └── RabbitMQConfig.java       
 │   │   ├── controller/
-│   │   ├── service/
+│   │   │   └── UserController.java       
+│   │   ├── dto/                          
+│   │   │   ├── LoginDTO.java
+│   │   │   ├── LoginResponseDTO.java
+│   │   │   ├── RegisterDTO.java
+│   │   │   ├── SingletonTestResponse.java
+│   │   │   ├── SubscriptionUpdateDTO.java
+│   │   │   └── UserDTO.java
+│   │   ├── exception/                    
+│   │   │   ├── DuplicateEmailException.java
+│   │   │   ├── DuplicateUsernameException.java
+│   │   │   ├── GlobalExceptionHandler.java
+│   │   │   ├── InvalidCredentialsException.java
+│   │   │   └── UserNotFoundException.java
+│   │   ├── messaging/                    
+│   │   │   ├── ContentEventMessage.java
+│   │   │   ├── ContentEventMessageConsumer.java
+│   │   │   ├── MessageQueuePublisher.java
+│   │   │   └── UserEventMessage.java
+│   │   ├── model/
+│   │   │   └── User.java                 
 │   │   ├── repository/
-│   │   ├── model/               # Content, Movie, TVSeries
-│   │   └── dto/
+│   │   │   └── UserRepository.java
+│   │   └── service/
+│   │       └── UserService.java          
+│   ├── src/main/resources/
+│   │   └── application.yml               
 │   ├── Dockerfile
 │   └── pom.xml
 │
-├── video-service/               # Observer Pattern (Port 8083)
-│   ├── src/main/java/
-│   │   ├── observer/
-│   │   │   ├── VideoEventPublisher.java      # Event publisher
-│   │   │   ├── AnalyticsObserver.java        # Analytics tracking
-│   │   │   └── RecommendationUpdateObserver.java  # Update recommendations
+├── content-service/                      
+│   ├── src/main/java/com/example/contentservice/
+│   │   ├── ContentServiceApplication.java
+│   │   ├── config/
+│   │   │   └── RabbitMQConfig.java      
 │   │   ├── controller/
-│   │   ├── service/
+│   │   │   └── ContentController.java
+│   │   ├── dto/
+│   │   │   ├── ContentCreateDTO.java
+│   │   │   ├── ContentResponseDTO.java
+│   │   │   └── ContentUpdateDTO.java
+│   │   ├── exception/
+│   │   │   ├── ContentNotFoundException.java
+│   │   │   ├── ContentValidationException.java
+│   │   │   ├── GlobalExceptionHandler.java
+│   │   │   └── InvalidContentTypeException.java
+│   │   ├── factory/                      
+│   │   │   ├── ContentFactory.java       
+│   │   │   ├── MovieFactory.java         
+│   │   │   └── TVSeriesFactory.java     
+│   │   ├── messaging/                    
+│   │   │   ├── ContentEventMessage.java
+│   │   │   ├── MessageQueuePublisher.java
+│   │   │   ├── UserEventMessage.java
+│   │   │   └── UserEventMessageConsumer.java
+│   │   ├── model/                       
+│   │   │   ├── Content.java
+│   │   │   ├── Movie.java
+│   │   │   └── TVSeries.java
 │   │   ├── repository/
-│   │   ├── model/               # WatchEvent, Rating
-│   │   └── dto/
+│   │   │   └── ContentRepository.java
+│   │   └── service/
+│   │       └── ContentService.java
+│   ├── src/main/resources/
+│   │   └── application.yml
 │   ├── Dockerfile
 │   └── pom.xml
 │
-├── recommendation-service/      # Strategy Pattern (Port 8084)
-│   ├── src/main/java/
-│   │   ├── strategy/
-│   │   │   ├── RecommendationStrategy.java   # Strategy interface
-│   │   │   ├── TrendingStrategy.java         # For new users
-│   │   │   ├── HistoryBasedStrategy.java     # For returning users
-│   │   │   └── RatingBasedStrategy.java      # For users with ratings
+├── video-service/                        
+│   ├── src/main/java/com/example/videoservice/
+│   │   ├── VideoServiceApplication.java
+│   │   ├── config/
+│   │   │   ├── RabbitMQConfig.java       
+│   │   │   └── RestTemplateConfig.java   
 │   │   ├── controller/
-│   │   ├── service/
+│   │   │   └── VideoController.java
+│   │   ├── dto/
+│   │   │   ├── ContentResponseDTO.java
+│   │   │   ├── RatingCreateDTO.java
+│   │   │   ├── RatingResponseDTO.java
+│   │   │   ├── WatchEventCreateDTO.java
+│   │   │   └── WatchEventResponseDTO.java
+│   │   ├── exception/
+│   │   │   ├── ContentNotFoundException.java
+│   │   │   └── GlobalExceptionHandler.java
+│   │   ├── messaging/                    
+│   │   │   ├── ContentEventMessage.java
+│   │   │   ├── ContentEventMessageConsumer.java
+│   │   │   ├── MessageQueuePublisher.java
+│   │   │   └── UserPreferenceMessage.java
+│   │   ├── model/
+│   │   │   ├── Rating.java
+│   │   │   └── WatchEvent.java
+│   │   ├── observer/                     
+│   │   │   ├── AnalyticsObserver.java
+│   │   │   ├── ContentRatedEvent.java
+│   │   │   ├── EventObserver.java
+│   │   │   ├── RecommendationUpdateObserver.java
+│   │   │   ├── VideoEvent.java
+│   │   │   ├── VideoEventPublisher.java
+│   │   │   └── VideoWatchedEvent.java
 │   │   ├── repository/
-│   │   ├── model/               # UserPreference
-│   │   └── dto/
+│   │   │   ├── RatingRepository.java
+│   │   │   └── WatchEventRepository.java
+│   │   └── service/
+│   │       └── VideoService.java
+│   ├── src/main/resources/
+│   │   └── application.yml
 │   ├── Dockerfile
 │   └── pom.xml
 │
-├── postman/                     # API Testing
+├── recommendation-service/               
+│   ├── src/main/java/com/example/recommendationservice/
+│   │   ├── RecommendationServiceApplication.java
+│   │   ├── config/
+│   │   │   ├── RabbitMQConfig.java      
+│   │   │   └── RestTemplateConfig.java
+│   │   ├── controller/
+│   │   │   └── RecommendationController.java
+│   │   ├── dto/
+│   │   │   ├── ContentResponseDTO.java
+│   │   │   ├── RecommendationResponseDTO.java
+│   │   │   └── UserPreferenceUpdateDTO.java
+│   │   ├── exception/
+│   │   │   ├── GlobalExceptionHandler.java
+│   │   │   ├── RecommendationException.java
+│   │   │   └── UserPreferenceNotFoundException.java
+│   │   ├── messaging/                    
+│   │   │   ├── ContentEventMessage.java
+│   │   │   ├── ContentEventMessageConsumer.java
+│   │   │   ├── UserEventMessage.java
+│   │   │   ├── UserEventMessageConsumer.java
+│   │   │   ├── UserPreferenceMessage.java
+│   │   │   └── UserPreferenceMessageConsumer.java
+│   │   ├── model/
+│   │   │   └── UserPreference.java
+│   │   ├── repository/
+│   │   │   └── RecommendationRepository.java
+│   │   ├── service/
+│   │   │   ├── RecommendationEngine.java
+│   │   │   └── RecommendationService.java
+│   │   └── strategy/                     
+│   │       ├── HistoryBasedStrategy.java
+│   │       ├── RatingBasedStrategy.java
+│   │       ├── RecommendationStrategy.java
+│   │       └── TrendingStrategy.java
+│   ├── src/main/resources/
+│   │   └── application.yml
+│   ├── Dockerfile
+│   └── pom.xml
+│
+├── postman/                             
 │   ├── StreamFlix_Complete_Collection.postman_collection.json
-│   └── README.md
+│   
 │
 ├── docs/
-│   └── diagrams/                # UML diagrams (Milestone 2)
+│   └── diagrams/                         
+│       ├── ClassDiagram.png
+│       ├── SeqDiagram1.png
+│       └── SeqDiagram2.png
 │
-├── docker-compose.yml           # Docker orchestration
-├── build-all.sh                 # Build script (Mac/Linux)
-├── build-all.bat                # Build script (Windows)
-├── QUICKSTART.md                # Quick start guide
-├── FIXES_APPLIED.md             # Recent fixes documentation
-└── README.md                    # This file
+├── docker-compose.yml                     
+├── build-all.bat                        
+├── README.md                             
+├── pom.xml                              
+└── src/                                  
+    ├── main/java/com/example/            
+    └── main/resources/                
 ```
-
----
-
-## Troubleshooting
-
-### Services Won't Start
-
-**Check logs:**
-```bash
-docker-compose logs <service-name>
-```
-
-**Rebuild without cache:**
-```bash
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-### Port Already in Use
-
-**Find process using port (Mac/Linux):**
-```bash
-lsof -i :8080
-```
-
-**Find process using port (Windows):**
-```bash
-netstat -ano | findstr :8080
-```
-
-**Kill process:**
-```bash
-kill -9 <PID>  # Mac/Linux
-taskkill /PID <PID> /F  # Windows
-```
-
-### Database Connection Issues
-
-**Check PostgreSQL containers:**
-```bash
-docker-compose ps | grep postgres
-```
-
-**Restart databases:**
-```bash
-docker-compose restart postgres-user postgres-content postgres-video postgres-recommendation
-```
-
-### Build Fails
-
-**Clean Maven cache:**
-```bash
-mvn clean
-```
-
-**Verify Java version:**
-```bash
-java -version  # Must be Java 17
-```
-
-### UI Not Loading
-
-**Check if API Gateway has UI files:**
-```bash
-docker exec streamflix-api-gateway ls -la /app/BOOT-INF/classes/static/ui/
-```
-
-**Rebuild API Gateway:**
-```bash
-cd api-gateway
-mvn clean package -DskipTests
-docker-compose build api-gateway
-docker-compose up -d api-gateway
-```
-
----
-
-## References
-
-- **Design Patterns**: [Refactoring Guru](https://refactoring.guru/design-patterns)
-- **Spring Boot**: [Documentation](https://spring.io/projects/spring-boot)
-- **Spring Cloud Gateway**: [Documentation](https://spring.io/projects/spring-cloud-gateway)
-- **Docker**: [Documentation](https://docs.docker.com/)
-- **PostgreSQL**: [Documentation](https://www.postgresql.org/docs/)
-- **Microservices Architecture**: [Microservices.io](https://microservices.io/)
-
----
-
 ## Team
 
 **Bilciurescu Elena-Alina** - 1241EA  
