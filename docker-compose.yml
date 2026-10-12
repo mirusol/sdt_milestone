@@ -11,7 +11,7 @@ services:
     environment:
       POSTGRES_DB: userdb
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     ports:
       - "5432:5432"
     volumes:
@@ -28,7 +28,7 @@ services:
     environment:
       POSTGRES_DB: contentdb
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     ports:
       - "5433:5432"
     volumes:
@@ -45,7 +45,7 @@ services:
     environment:
       POSTGRES_DB: videodb
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     ports:
       - "5434:5432"
     volumes:
@@ -62,7 +62,7 @@ services:
     environment:
       POSTGRES_DB: recommendationdb
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     ports:
       - "5435:5432"
     volumes:
@@ -85,7 +85,7 @@ services:
       - "15672:15672" # Management UI port
     environment:
       RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-admin123}
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
@@ -109,15 +109,15 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-user:5432/userdb
       - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-password}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
-      - JWT_SECRET=streamflix-secret-key-change-in-production
+      - JWT_SECRET=${JWT_SECRET:-dev-only-secret-change-me}
       - JWT_EXPIRATION_MS=86400000
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
       - SPRING_RABBITMQ_USERNAME=admin
-      - SPRING_RABBITMQ_PASSWORD=admin123
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-admin123}
     depends_on:
       postgres-user:
         condition: service_healthy
@@ -140,13 +140,13 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-content:5432/contentdb
       - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-password}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
       - SPRING_RABBITMQ_USERNAME=admin
-      - SPRING_RABBITMQ_PASSWORD=admin123
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-admin123}
     depends_on:
       postgres-content:
         condition: service_healthy
@@ -169,7 +169,7 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-video:5432/videodb
       - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-password}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - CONTENT_SERVICE_URL=http://content-service:8082
@@ -177,7 +177,7 @@ services:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
       - SPRING_RABBITMQ_USERNAME=admin
-      - SPRING_RABBITMQ_PASSWORD=admin123
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-admin123}
     depends_on:
       postgres-video:
         condition: service_healthy
@@ -204,14 +204,14 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-recommendation:5432/recommendationdb
       - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-password}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - CONTENT_SERVICE_URL=http://content-service:8082
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
       - SPRING_RABBITMQ_USERNAME=admin
-      - SPRING_RABBITMQ_PASSWORD=admin123
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD:-admin123}
     depends_on:
       postgres-recommendation:
         condition: service_healthy
