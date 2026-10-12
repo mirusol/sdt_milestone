@@ -1,4 +1,4 @@
-# MILESTONE 5- StreamFlix - Microservices Video Streaming Platform
+# StreamFlix: Microservices Video Streaming Platform
 
 A Netflix-like video streaming platform demonstrating microservices architecture, design patterns, **message queue integration**, and a **CI/CD pipeline**
 
@@ -34,6 +34,25 @@ This **Milestone 5** extends the previous milestones by:
 - **CI/CD**: GitHub Actions (automated build, test, deploy)
 - **API Testing**: Postman (30 essential requests)
 - **Build Tool**: Maven 3.8+
+
+---
+
+## My contribution
+
+StreamFlix was a team project (see [Team](#team)). The parts I built:
+
+- **user-service**: registration, login, BCrypt password hashing, subscription tiers (BASIC, STANDARD, PREMIUM) and the Singleton `ConfigurationManager` that holds shared settings.
+- **content-service**: the catalog endpoints (create, update, delete, search, filter by genre, most viewed, top rated), the Factory pattern for movies and TV series, and this service's RabbitMQ integration: queue configuration, the publisher for `content.events`, and the consumer for `user.events`.
+- **Docker and docker-compose**: one Compose file that starts four PostgreSQL databases (one per data-owning service), RabbitMQ and the five services, with health checks and environment-based configuration.
+- **GitHub Actions CI/CD**: a four-job pipeline: build and test every service, build the Docker images, deploy the stack to a Docker environment on the runner, then run an integration-test job against it.
+
+The video-service, recommendation-service and API gateway were built by my teammates.
+
+## Known limitations
+
+- **The login token is a placeholder, not a real JWT.** `UserService.generateJwtToken` returns `streamflix.` plus the Base64 of `id:email:tier:expiry`. It is unsigned, so it can be forged, and no other service verifies it. A real implementation would sign it with HMAC-SHA256 (for example with `jjwt`) and validate it in the gateway.
+- **No automated tests.** None of the services has unit or integration tests, and the CI step runs `mvn test || true`, so a failing test would not fail the build. Postman collections cover the API by hand.
+- **Development credentials.** The database, RabbitMQ and token-secret values in `docker-compose.yml` are local-development defaults. Copy `.env.example` to `.env` and set your own before exposing anything.
 
 ---
 
@@ -512,6 +531,8 @@ Username: admin
 Password: admin123
 ```
 
+These are the development defaults from `docker-compose.yml`; override them with `RABBITMQ_PASSWORD` in `.env`.
+
 **View queue status:**
 - Navigate to "Queues" tab
 - Check `user.preference.updates` queue
@@ -895,11 +916,8 @@ streamflix/
 │
 ├── docker-compose.yml                     
 ├── build-all.bat                        
-├── README.md                             
-├── pom.xml                              
-└── src/                                  
-    ├── main/java/com/example/            
-    └── main/resources/                
+├── .env.example
+└── README.md
 ```
 ## Team
 
