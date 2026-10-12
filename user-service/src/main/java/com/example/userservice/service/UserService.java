@@ -315,11 +315,11 @@ public class UserService {
             ? "SUCCESS: All instances reference the SAME ConfigurationManager singleton object"
             : "FAILURE: Instances are different - Singleton pattern violated!";
         
+        // Secrets (JWT secret, password salt) are deliberately not included: this endpoint
+        // is public and only needs to prove that every instance shares the same settings.
         String configDetails = String.format(
-            "JWT Secret: %s, JWT Expiration: %d ms, Password Salt: %s, Rate Limit: %d per minute",
-            instance1.getJwtSecret(),
+            "JWT Expiration: %d ms, Rate Limit: %d per minute (secrets withheld)",
             instance1.getJwtExpirationMs(),
-            instance1.getPasswordSalt(),
             instance1.getRateLimit()
         );
         
